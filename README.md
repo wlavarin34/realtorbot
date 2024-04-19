@@ -33,11 +33,11 @@ This feature uses Puppeteer with NodeJS and TypeScript to scrape home listings f
 
 2. **Open Postman.**
 
-3. **Set the request method to `POST`.**
+3. **Set the request method to `GET`.**
 
 4. **Enter the following URL:**
     ```
-    http://localhost:3000/scrape
+    http://localhost:3000/routes/search
     ```
 
 5. **Set the request body to `raw` and `JSON (application/json)`.**
@@ -56,7 +56,7 @@ This feature uses Puppeteer with NodeJS and TypeScript to scrape home listings f
 ### Request
 
 - **Method**: POST
-- **URL**: `http://localhost:3000/scrape`
+- **URL**: `http://localhost:3000/routes/search`
 - **Body**: 
     ```json
     {

@@ -110,8 +110,8 @@ async function getListings(page: any, page2:any, pageIndex: number) {
             console.log("done");
             console.log(listings);
             await FileSystem.writeFile('file.json', JSON.stringify({listings: listings}));
-            //await page2.bringToFront();
-            //await page2.goto('https://google.com/');
+            await page2.bringToFront();
+            await page2.goto('https://realtor.com'+listings[0].link);
         }
     } catch (e) {
         console.log(e);

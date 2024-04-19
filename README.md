@@ -45,7 +45,7 @@ This feature uses Puppeteer with NodeJS and TypeScript to scrape home listings f
 6. **Enter the Google search string in the request body:**
     ```json
     {
-        "searchQuery": "top home listing websites"
+        "search: "Neptune NJ"
     }
     ```
 
@@ -60,7 +60,7 @@ This feature uses Puppeteer with NodeJS and TypeScript to scrape home listings f
 - **Body**: 
     ```json
     {
-        "searchQuery": "top home listing websites"
+        "search": "Eatontown NJ"
     }
     ```
 
@@ -73,12 +73,17 @@ Example Response:
 {
     "listings": [
         {
-            "title": "Home Title",
+            "image": "https://image.jpg",
             "price": "$500,000",
-            "address": "123 Main St, City, State",
+            "title": "123 Main St, City, State",
+            "link": "https://link.com"
+            "specs": {
             "bedrooms": "3",
             "baths": "2",
-            "sqft": "2000"
+            "sqft": "2000",
+                etc...
+            }
+            
         },
         ...
     ]

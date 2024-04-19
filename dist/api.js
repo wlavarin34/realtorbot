@@ -60,7 +60,7 @@ async function getListings(page, page2, pageIndex) {
         await page.waitForSelector('section[data-testid="property-list"]');
         await autoScrollFast(page, 100);
         await page.waitForSelector('div[aria-label="pagination"]', { timeout: 5000 });
-        const links = await page.evaluate(() => {
+        var links = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('section[data-testid="property-list"] > div'), elem => {
                 const obj = {
                     title: elem.querySelector('div[data-testid="card-address"]')?.textContent || undefined,
@@ -70,13 +70,14 @@ async function getListings(page, page2, pageIndex) {
                     specs: {
                         beds: elem.querySelector('li[data-testid="property-meta-beds"] > span[data-testid="meta-value"]')?.textContent || undefined,
                         bath: elem.querySelector('li[data-testid="property-meta-baths"] > span[data-testid="meta-value"]')?.textContent || undefined,
-                        sqft: elem.querySelector('li[data-testid="property-meta-sqft"]')?.textContent || undefined,
-                        lotsize: elem.querySelector('li[data-testid="property-meta-lot-size"]')?.textContent || undefined,
+                        sqft: elem.querySelector('li[data-testid="property-meta-sqft"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
+                        lotsize: elem.querySelector('li[data-testid="property-meta-lot-size"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
                     }
                 };
                 return obj;
             });
         });
+        links = links.filter((obj) => Object.keys(obj).includes("title"));
         listings = [...listings, ...links];
         const exist = await page.$(`a[aria-label="Go to page ${pageIndex + 1}"]`);
         if (exist) {
@@ -87,9 +88,9 @@ async function getListings(page, page2, pageIndex) {
         else {
             console.log("done");
             console.log(listings);
-            await fs_1.promises.writeFile('file.json', JSON.stringify(listings));
-            await page2.bringToFront();
-            await page2.goto('https://realtor.com'+listings[0].link);
+            await fs_1.promises.writeFile('file.json', JSON.stringify({ listings: listings }));
+            //await page2.bringToFront();
+            //await page2.goto('https://google.com/');
         }
     }
     catch (e) {

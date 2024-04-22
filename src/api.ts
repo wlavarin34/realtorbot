@@ -120,7 +120,7 @@ async function getListings(page: any, page2:any, pageIndex: number) {
             console.log(listings);
             await FileSystem.writeFile('file.json', JSON.stringify({listings: listings}));
             await page2.bringToFront();
-            await page2.goto('https://realtor.com'+listings[0].details?.child?.link);
+            await page2.goto(listings[0].details?.child?.link);
             await autoScrollFast(page2,10);
             let element = await page2.$('button[data-testid="est-payment"]')
             let value = await page2.evaluate((el:any) => el.textContent, element);

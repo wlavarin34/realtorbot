@@ -68,16 +68,19 @@ async function getListings(page, page2, pageIndex) {
         await page.waitForSelector('div[aria-label="pagination"]', { timeout: 5000 });
         var links = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('section[data-testid="property-list"] > div'), elem => {
+                var baseUrl = "https://realtor.com";
                 const obj = {
                     title: elem.querySelector('div[data-testid="card-address"]')?.textContent || undefined,
                     price: elem.querySelector('div[data-testid="card-price"]')?.textContent || undefined,
                     image: elem.querySelector('img[data-testid="picture-img"]')?.getAttribute("data-src") || undefined,
-                    link: elem.querySelector('div[data-testid="card-content"] > a')?.getAttribute("href") || undefined,
-                    specs: {
+                    details: {
                         beds: elem.querySelector('li[data-testid="property-meta-beds"] > span[data-testid="meta-value"]')?.textContent || undefined,
                         bath: elem.querySelector('li[data-testid="property-meta-baths"] > span[data-testid="meta-value"]')?.textContent || undefined,
                         sqft: elem.querySelector('li[data-testid="property-meta-sqft"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
                         lotsize: elem.querySelector('li[data-testid="property-meta-lot-size"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
+                        child: {
+                            link: baseUrl + elem.querySelector('div[data-testid="card-content"] > a')?.getAttribute("href") || undefined,
+                        }
                     }
                 };
                 return obj;
@@ -96,7 +99,7 @@ async function getListings(page, page2, pageIndex) {
             console.log(listings);
             await fs_1.promises.writeFile('file.json', JSON.stringify({ listings: listings }));
             await page2.bringToFront();
-            await page2.goto('https://realtor.com' + listings[0].link);
+            await page2.goto(listings[0].details?.child?.link);
             await autoScrollFast(page2, 10);
             let element = await page2.$('button[data-testid="est-payment"]');
             let value = await page2.evaluate((el) => el.textContent, element);

@@ -76,14 +76,14 @@ Example Response:
             "image": "https://image.jpg",
             "price": "$500,000",
             "title": "123 Main St, City, State",
-            "link": "https://link.com"
-            "specs": {
+            "details": {
             "bedrooms": "3",
             "baths": "2",
             "sqft": "2000",
-                etc...
+            "child":{
+                 "link": "https://link.com"
+              }
             }
-            
         },
         ...
     ]

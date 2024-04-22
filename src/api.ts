@@ -13,12 +13,14 @@ interface Listing {
     title?: string;
     price?: string;
     image?: string;
-    link?: string;
-    specs?: {
+    details?: {
         beds?: string;
         bath?: string;
         sqft?: string;
         lotsize?: string;
+        child?:{
+            link?: string
+        }
     };
 }
 
@@ -54,11 +56,15 @@ async function googleStep(page: any) {
         await page.goto('https://google.com/');
         await page.type('textarea[aria-label="Search"]', "top home listing websites");
         await page.keyboard.press('Enter');
-
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+        try {
         await page.waitForXPath("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
         const [button] = await page.$x("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
         if (button) {
             await button.click();
+        }
+        } catch (error) {
+            console.log("modal is not there");
         }
         await autoScroll(page);
         await page.waitForSelector('a[href="https://www.realtor.com/"]');
@@ -84,16 +90,19 @@ async function getListings(page: any, page2:any, pageIndex: number) {
 
         var links = await page.evaluate(() => {
             return Array.from(document.querySelectorAll('section[data-testid="property-list"] > div'), elem => {
+                var baseUrl = "https://realtor.com"
                 const obj: Listing = {
                     title: elem.querySelector('div[data-testid="card-address"]')?.textContent || undefined,
                     price: elem.querySelector('div[data-testid="card-price"]')?.textContent || undefined,
                     image: elem.querySelector('img[data-testid="picture-img"]')?.getAttribute("data-src") || undefined,
-                    link: elem.querySelector('div[data-testid="card-content"] > a')?.getAttribute("href") || undefined,
-                    specs: {
+                    details: {
                         beds: elem.querySelector('li[data-testid="property-meta-beds"] > span[data-testid="meta-value"]')?.textContent || undefined,
                         bath: elem.querySelector('li[data-testid="property-meta-baths"] > span[data-testid="meta-value"]')?.textContent || undefined,
                         sqft: elem.querySelector('li[data-testid="property-meta-sqft"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
                         lotsize: elem.querySelector('li[data-testid="property-meta-lot-size"] > span > span[data-testid="meta-value"]')?.textContent || undefined,
+                        child:{
+                           link: baseUrl+elem.querySelector('div[data-testid="card-content"] > a')?.getAttribute("href") || undefined,
+                        }
                     }
                 };
                 return obj;
@@ -111,7 +120,11 @@ async function getListings(page: any, page2:any, pageIndex: number) {
             console.log(listings);
             await FileSystem.writeFile('file.json', JSON.stringify({listings: listings}));
             await page2.bringToFront();
-            await page2.goto('https://realtor.com'+listings[0].link);
+            await page2.goto('https://realtor.com'+listings[0].details?.child?.link);
+            await autoScrollFast(page2,10);
+            let element = await page2.$('button[data-testid="est-payment"]')
+            let value = await page2.evaluate((el:any) => el.textContent, element);
+            console.log(value);
         }
     } catch (e) {
         console.log(e);

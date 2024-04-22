@@ -35,10 +35,16 @@ async function googleStep(page) {
         await page.goto('https://google.com/');
         await page.type('textarea[aria-label="Search"]', "top home listing websites");
         await page.keyboard.press('Enter');
-        await page.waitForXPath("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
-        const [button] = await page.$x("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
-        if (button) {
-            await button.click();
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+        try {
+            await page.waitForXPath("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
+            const [button] = await page.$x("/html/body/div[4]/div/div[7]/div/div[2]/span/div/div[2]/div[3]/g-raised-button");
+            if (button) {
+                await button.click();
+            }
+        }
+        catch (error) {
+            console.log("modal is not there");
         }
         await autoScroll(page);
         await page.waitForSelector('a[href="https://www.realtor.com/"]');
@@ -89,8 +95,12 @@ async function getListings(page, page2, pageIndex) {
             console.log("done");
             console.log(listings);
             await fs_1.promises.writeFile('file.json', JSON.stringify({ listings: listings }));
-            //await page2.bringToFront();
-            //await page2.goto('https://google.com/');
+            await page2.bringToFront();
+            await page2.goto('https://realtor.com' + listings[0].link);
+            await autoScrollFast(page2, 10);
+            let element = await page2.$('button[data-testid="est-payment"]');
+            let value = await page2.evaluate((el) => el.textContent, element);
+            console.log(value);
         }
     }
     catch (e) {
